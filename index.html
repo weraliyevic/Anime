@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease-in;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 40px;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1em;
+            border: 2px solid #667eea;
+            border-radius: 30px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #667eea;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .card-img:hover {
+            transform: scale(1.05);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: zoomIn 0.3s;
+        }
+
+        .modal-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            height: 95%;
+            animation: zoomIn 0.3s;
+        }
+
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .close:hover {
+            color: #ff6b6b;
+        }
+
+        .watch-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 99, 71, 0.9);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .watch-btn:hover {
+            background: rgba(255, 69, 0, 1);
+            transform: scale(1.05);
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: translate(-50%, -50%) scale(0);
+            }
+
+            to {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .card-genre {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 15px;
+            font-size: 0.85em;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .card-rating {
+            margin-top: 10px;
+            color: #ffa500;
+            font-weight: bold;
+        }
+
+        .card-desc {
+            color: #666;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .no-results {
+            text-align: center;
+            color: white;
+            font-size: 1.5em;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🎌 Anime Hub</h1>
+            <p>Eng yaxshi anime'larni kashf eting</p>
+        </header>
+
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="Anime izlang...">
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="filterContent('all')">Barchasi</button>
+            <button class="tab-btn" onclick="filterContent('jang')">Jang</button>
+            <button class="tab-btn" onclick="filterContent('sarguzasht')">Sarguzasht</button>
+            <button class="tab-btn" onclick="filterContent('fantastika')">Fantastika</button>
+        </div>
+
+        <div class="grid" id="contentGrid"></div>
+        <div class="no-results" id="noResults" style="display: none;">Hech narsa topilmadi 😢</div>
+    </div>
+
+    <div id="imageModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <div id="videoModal" class="modal">
+        <span class="close" onclick="closeVideoModal()">&times;</span>
+        <iframe class="modal-video" id="modalVideo" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+    </div>
+
+    <script>
+        const content = [
+            {
+                title: "One Piece",
+                type: "manga",
+                genres: ["Sarguzasht", "Jang", "Fantastika"],
+                rating: "⭐ 9.2/10",
+                desc: "Luffy va uning jamoasi Buyuk Xazinani qidirishda",
+                image: "https://m.media-amazon.com/images/M/MV5BMTNjNGU4NTUtYmVjMy00YjRiLTkxMWUtNzZkMDNiYjZhNmViXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+                video: "https://www.youtube.com/embed/MCb13lbVGE0"
+            },
+            {
+                title: "Naruto",
+                type: "anime",
+                genres: ["Jang", "Sarguzasht"],
+                rating: "⭐ 8.9/10",
+                desc: "Ninja dunyosida hokage bo'lish orzusidagi yosh ninja",
+                image: "https://m.media-amazon.com/images/M/MV5BZmQ5NGFiNWEtMmMyMC00MDdiLTg4YjktOGY5Yzc2MDUxMTE1XkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_.jpg",
+                video: "https://www.youtube.com/embed/QczGoCmX-pI"
+            },
+            {
+                title: "Attack on Titan",
+                type: "anime",
+                genres: ["Jang", "Drama", "Fantastika"],
+                rating: "⭐ 9.0/10",
+                desc: "Insoniyat ulkan titanlar bilan kurashadi",
+                image: "https://i.pinimg.com/736x/b4/d2/33/b4d2330e94a9797cd645dfac0ac0cbc5.jpg",
+                video: "https://www.youtube.com/embed/LHtdKWJdif4"
+            },
+            {
+                title: "Demon Slayer",
+                type: "anime",
+                genres: ["Jang", "Sarguzasht"],
+                rating: "⭐ 8.7/10",
+                desc: "Tanjiro o'z oilasining qasosini olish uchun jang qiladi",
+                image: "https://m.media-amazon.com/images/M/MV5BZjZjNzI5MDctY2Y4YS00NmM4LTljMmItZTFkOTExNGI3ODRhXkEyXkFqcGdeQXVyNjc3MjQzNTI@._V1_.jpg",
+                video: "https://www.youtube.com/embed/VQGCKyvzIM4"
+            },
+            {
+                title: "My Hero Academia",
+                type: "manga",
+                genres: ["Jang", "Sarguzasht"],
+                rating: "⭐ 8.5/10",
+                desc: "Super qahramonlar olamida eng kuchli qahramon bo'lish",
+                image: "https://upload.wikimedia.org/wikipedia/en/1/13/My_Hero_Academia_-_You%27re_Next.png",
+                video: "https://www.youtube.com/embed/D5fYOnwYkj4"
+            },
+            {
+                title: "Death Note",
+                type: "manga",
+                genres: ["Sir", "Triller"],
+                rating: "⭐ 9.0/10",
+                desc: "O'lim daftarini topgan talaba dunyoni o'zgartirmoqchi",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJCp1AIyMA0ykJNEgaou1TA5lNcCIE3YzqFCd8l9yY5W4L1MrRVK2fWWasbjkx-mRwrlqv&s=10",
+                video: "https://www.youtube.com/embed/tJZtOrm-WPk"
+            },
+            {
+                title: "Fullmetal Alchemist",
+                type: "anime",
+                genres: ["Jang", "Sarguzasht", "Fantastika"],
+                rating: "⭐ 9.1/10",
+                desc: "Ikki aka-uka yo'qotgan narsalarini qaytarish uchun sarguzasht",
+                image: "https://m.media-amazon.com/images/I/71b0kmOnLHL._AC_UF894,1000_QL80_.jpg",
+                video: "https://www.youtube.com/embed/d9SefOlRp5M"
+            },
+
+            {
+                title: "Jujutsu Kaisen",
+                type: "anime",
+                genres: ["Jang", "Fantastika"],
+                rating: "⭐ 8.6/10",
+                desc: "Qarg'ishlar bilan kurashuvchi yoshlar guruhi",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQc_OCPpEGp_MnMkEOdodONMSffsljp1IJQlw&s",
+                video: "https://www.youtube.com/embed/pkKu9hLT-t8"
+            },
+            {
+                title: "Spy x Family",
+                type: "anime",
+                genres: ["Komediya", "Aksiya", "Oilaviy"],
+                rating: "⭐ 8.7/10",
+                desc: "Maxfiy agent oila yig‘ishga majbur bo‘ladi, ammo ular hammasi sirli odamlar.",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC1GcQijnl0TfhTcKqdkzE7lZWhLTeGYl-Zg&s",
+                video: "https://www.youtube.com/embed/rsYk8ZZ4fOA"
+            },
+            {
+                title: "Tokyo Ghoul",
+                type: "anime",
+                genres: ["Jang", "Qo'rqinchli"],
+                rating: "⭐ 8.3/10",
+                desc: "Inson va ghul o'rtasida qolgan yigit hikoyasi",
+                image: "https://images.justwatch.com/poster/102012613/s718/tokyo-ghoul-2014.jpg",
+                video: "https://www.youtube.com/embed/vGuQeQsoRgU"
+            },
+            {
+                title: "Chainsaw Man",
+                type: "manga",
+                genres: ["Jang", "Qo'rqinchli"],
+                rating: "⭐ 8.7/10",
+                desc: "Zanjir arra iblisi kuchiga ega yigit",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC1GcQijnl0TfhTcKqdkzE7lZWhLTeGYl-Zg&s",
+                video: "https://www.youtube.com/embed/rsYk8ZZ4fOA"
+            },
+            {
+                title: "Sword Art Online",
+                type: "anime",
+                genres: ["Jang", "Sarguzasht", "Fantastika"],
+                rating: "⭐ 8.1/10",
+                desc: "Virtual reallik o'yinida qamalib qolgan o'yinchilar",
+                image: "https://culturedvultures.com/wp-content/uploads/2022/10/Sword-Art-Online.jpg",
+                video: "https://www.youtube.com/embed/6ohYYtxfDCg"
+            }
+        ];
+
+        let currentFilter = 'all';
+
+        function displayContent(items) {
+            const grid = document.getElementById('contentGrid');
+            const noResults = document.getElementById('noResults');
+
+            if (items.length === 0) {
+                grid.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            grid.style.display = 'grid';
+            noResults.style.display = 'none';
+            grid.innerHTML = items.map((item, index) => `
+                <div class="card">
+                    <div style="position: relative;">
+                        <img src="${item.image}" alt="${item.title}" class="card-img" data-index="${index}">
+                        <button class="watch-btn" data-video="${item.video}">▶ Tomosha</button>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">${item.title}</div>
+                        <div>
+                            ${item.genres.map(g => `<span class="card-genre">${g}</span>`).join('')}
+                        </div>
+                        <div class="card-rating">${item.rating}</div>
+                        <div class="card-desc">${item.desc}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add click events to images
+            document.querySelectorAll('.card-img').forEach(img => {
+                img.addEventListener('click', function () {
+                    openModal(this.src);
+                });
+            });
+
+            // Add click events to watch buttons
+            document.querySelectorAll('.watch-btn').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    openVideoModal(this.dataset.video);
+                });
+            });
+        }
+
+        function filterContent(filter) {
+            currentFilter = filter;
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            let filtered = content;
+            if (filter === 'manga' || filter === 'anime') {
+                filtered = content.filter(item => item.type === filter);
+            } else if (filter !== 'all') {
+                filtered = content.filter(item =>
+                    item.genres.some(g => g.toLowerCase() === filter.toLowerCase())
+                );
+            }
+
+            const searchTerm = document.getElementById('searchInput').value;
+            if (searchTerm) {
+                filtered = filtered.filter(item =>
+                    item.title.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+
+            displayContent(filtered);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            let filtered = content;
+
+            if (currentFilter === 'manga' || currentFilter === 'anime') {
+                filtered = filtered.filter(item => item.type === currentFilter);
+            } else if (currentFilter !== 'all') {
+                filtered = filtered.filter(item =>
+                    item.genres.some(g => g.toLowerCase() === currentFilter.toLowerCase())
+                );
+            }
+
+            if (searchTerm) {
+                filtered = filtered.filter(item =>
+                    item.title.toLowerCase().includes(searchTerm) ||
+                    item.desc.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            displayContent(filtered);
+        });
+
+        displayContent(content);
+
+        function openModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'block';
+            modalImg.src = imageSrc;
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        function openVideoModal(videoSrc) {
+            const modal = document.getElementById('videoModal');
+            const modalVideo = document.getElementById('modalVideo');
+            modal.style.display = 'block';
+            modalVideo.src = videoSrc;
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('videoModal');
+            const modalVideo = document.getElementById('modalVideo');
+            modal.style.display = 'none';
+            modalVideo.src = '';
+        }
+
+        document.getElementById('imageModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        document.getElementById('videoModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeVideoModal();
+            }
+        });
+    </script>
+</body>
+
+</html>
